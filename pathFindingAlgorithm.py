@@ -35,7 +35,7 @@ def changeDistance(row,rowElement,distance):
 #todo Kontrolli, et pole jõudnud paremasse äärde
 def checkNeighBours(row,rowElement, distance):
     #4 neighbours
-    if(row-1>=0 and rowElement-1>= 0):
+    if(row-1>=0 and rowElement-1>= 0 and row != 24 and rowElement != 39):
         changeDistance(row,rowElement+1,distance)
         changeDistance(row+1, rowElement, distance)
         changeDistance(row-1, rowElement, distance)
@@ -45,21 +45,41 @@ def checkNeighBours(row,rowElement, distance):
         changeDistance(row, rowElement + 1, distance)
         changeDistance(row+1, rowElement, distance)
     #Top row
-    elif (row -1 == -1 and rowElement-1 >= 0):
+    elif (row -1 == -1 and rowElement-1 >= 0 and rowElement != 39):
         changeDistance(row, rowElement + 1, distance)
         changeDistance(row+1, rowElement, distance)
         changeDistance(row, rowElement - 1, distance)
+
+    # Left bottom corner
+    elif (row == 24 and rowElement - 1 == -1):
+        changeDistance(row, rowElement + 1, distance)
+        changeDistance(row - 1, rowElement, distance)
+
     #Left column
     elif (row -1 >= 0 and rowElement-1 == -1):
         changeDistance(row, rowElement + 1, distance)
         changeDistance(row+1, rowElement, distance)
         changeDistance(row-1, rowElement, distance)
+    #Top right
+    elif (row == 0 and rowElement  == 39):
+        changeDistance(row, rowElement-1, distance)
+        changeDistance(row +1, rowElement, distance)
+    #Bottom right
+    elif (row == 24 and rowElement == 39):
+        changeDistance(row, rowElement - 1, distance)
+        changeDistance(row - 1, rowElement, distance)
 
-    #Left bottom corner
-    elif (row == 24 and rowElement-1 == -1):
-        positions[row][rowElement + 1][2] = distance + 1
-        positions[row + 1][rowElement][2] = distance + 1
+    #Right column
+    elif (row > 0 and rowElement == 39):
+        changeDistance(row, rowElement - 1, distance)
+        changeDistance(row + 1, rowElement, distance)
+        changeDistance(row - 1, rowElement, distance)
 
+    #Bottom row
+    elif (row == 24 and rowElement > 0):
+        changeDistance(row, rowElement + 1, distance)
+        changeDistance(row, rowElement-1, distance)
+        changeDistance(row - 1, rowElement, distance)
 #Function which is used to find the lowest node
 def findLowestNode():
     lowestX = 0
@@ -110,7 +130,7 @@ def dijkstra(startx, starty, endx, endy):
         node[1] = [18,243,243]
         screenUpdate()
 
-        time.sleep(0.04)
+        time.sleep(0.002)
     endNode[1] = (255, 0, 0)
 
 #Creating the game
@@ -124,7 +144,7 @@ pygame.display.update()
 buildGrid(800,20)
 running = True
 
-dijkstra(10,10,7,8)
+dijkstra(0,0,24,39)
 while running:
     #When program is closed
     for event in pygame.event.get():
