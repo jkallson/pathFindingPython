@@ -1,11 +1,12 @@
 import time
-
 import pygame
 
+#Array where all nodes will be held
 positions = []
-maxint = 99999
 #Method which is used to build a grid
 def buildGrid(y,w):
+    #Distance used for infinity
+    maxInt = 99999
     #Creating a grid
     for z in range(0, 500, w):
         row = []
@@ -13,9 +14,7 @@ def buildGrid(y,w):
             #Creating a rectangle
             rect = pygame.Rect(x, z, w - 1, w - 1)
             #Adding this retangle to row
-            if(z == 0 and x == 0):
-                row.append([rect, (0, 0, 0),0,False])
-            else: row.append([rect, (0, 0, 0),maxint,False])
+            row.append([rect, (0, 0, 0),maxInt,False])
         #Adding created row to the positions list
         positions.append(row)
 
@@ -27,56 +26,60 @@ def screenUpdate():
             pygame.draw.rect(screen, color, rect)
     pygame.display.flip()
 
-def colorAll():
-    for row in positions:
-        for item in row:
-            rect, color, distance, visited = item
-            pygame.draw.rect(screen, [123,12,63], rect)
-            time.sleep(0.1)
-            pygame.display.update()
+#Function which is used to decide if distance needs to be changed
+def changeDistance(row,rowElement,distance):
+    #If distance through some node is smaller that the existing distance, then change it
+    if(distance+1 < positions[row][rowElement][2]):
+        positions[row][rowElement][2] = distance + 1
 
 #todo Kontrolli, et pole jõudnud paremasse äärde
 def checkNeighBours(row,rowElement, distance):
     #4 neighbours
     if(row-1>=0 and rowElement-1>= 0):
-        positions[row][rowElement + 1][2] = distance + 1
-        positions[row + 1][rowElement][2] = distance + 1
-        positions[row-1][rowElement][2] = distance + 1
-        positions[row -1][rowElement-1][2] = distance + 1
+        changeDistance(row,rowElement+1,distance)
+        changeDistance(row+1, rowElement, distance)
+        changeDistance(row-1, rowElement, distance)
+        changeDistance(row, rowElement - 1, distance)
     #Left upper corner
     elif (row -1 == -1 and rowElement-1 == -1):
-        positions[row][rowElement+1][2] = distance + 1
-        positions[row+1][rowElement][2] = distance + 1
+        changeDistance(row, rowElement + 1, distance)
+        changeDistance(row+1, rowElement, distance)
     #Top row
     elif (row -1 == -1 and rowElement-1 >= 0):
-        positions[row][rowElement + 1][2] = distance + 1
-        positions[row + 1][rowElement][2] = distance + 1
-        positions[row][rowElement-1][2] = distance + 1
+        changeDistance(row, rowElement + 1, distance)
+        changeDistance(row+1, rowElement, distance)
+        changeDistance(row, rowElement - 1, distance)
     #Left column
-    elif (row -1 == -1 and rowElement-1 >= 0):
-        positions[row][rowElement + 1][2] = distance + 1
-        positions[row + 1][rowElement][2] = distance + 1
-        positions[row][rowElement - 1][2] = distance + 1
+    elif (row -1 >= 0 and rowElement-1 == -1):
+        changeDistance(row, rowElement + 1, distance)
+        changeDistance(row+1, rowElement, distance)
+        changeDistance(row-1, rowElement, distance)
 
     #Left bottom corner
     elif (row == 24 and rowElement-1 == -1):
         positions[row][rowElement + 1][2] = distance + 1
         positions[row + 1][rowElement][2] = distance + 1
 
+#Function which is used to find the lowest node
 def findLowestNode():
     lowestX = 0
     lowestY = 0
     currentBestDistance = 999999
+    #Iterating through all rows
     for i,row in enumerate(positions):
+        #Iterating through all row nodes
         for j,item in enumerate(row):
             rect, color, distance, visited = item
+            #If we have not visited the node and it has smaller best distance then lets keep that in memory
             if distance < currentBestDistance and not visited:
-                lowestY = j
+                #Row number
                 lowestX = i
+                # Row item number
+                lowestY = j
                 currentBestDistance = distance
-    #Row number, Place
     return lowestX,lowestY
 
+#Dijkstra algorithm
 def dijkstra(startx, starty, endx, endy):
     #Define the starting point
     startNode = positions[startx][starty]
@@ -86,8 +89,6 @@ def dijkstra(startx, starty, endx, endy):
     #Changing end and start point color
     startNode[1] = (123, 52, 126)
     endNode[1] = (123,52,126)
-
-    screenUpdate()
 
     #Changing the starting point distance to 0
     startNode[2] = 0
@@ -110,7 +111,7 @@ def dijkstra(startx, starty, endx, endy):
         screenUpdate()
 
         time.sleep(0.04)
-
+    endNode[1] = (255, 0, 0)
 
 #Creating the game
 pygame.init()
@@ -123,10 +124,8 @@ pygame.display.update()
 buildGrid(800,20)
 running = True
 
-
-dijkstra(0,0,24,39)
+dijkstra(10,10,7,8)
 while running:
-
     #When program is closed
     for event in pygame.event.get():
         if(event.type == pygame.QUIT):
