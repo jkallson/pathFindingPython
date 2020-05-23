@@ -5,6 +5,7 @@ import pygame
 positions = []
 #Method which is used to build a grid
 def buildGrid(y,w):
+
     #Distance used for infinity
     maxInt = 99999
     #Creating a grid
@@ -32,7 +33,7 @@ def changeDistance(row,rowElement,distance):
     if(distance+1 < positions[row][rowElement][2]):
         positions[row][rowElement][2] = distance + 1
 
-#todo Kontrolli, et pole jõudnud paremasse äärde
+#Find neighbours
 def checkNeighBours(row,rowElement, distance):
     #4 neighbours
     if(row-1>=0 and rowElement-1>= 0 and row != 24 and rowElement != 39):
@@ -98,7 +99,7 @@ def findLowestNode():
                 lowestY = j
                 currentBestDistance = distance
     return lowestX,lowestY
-
+#todo! Add a way to show the shortest path (should use backtracking)
 #Dijkstra algorithm
 def dijkstra(startx, starty, endx, endy):
     #Define the starting point
@@ -144,7 +145,7 @@ pygame.display.update()
 buildGrid(800,20)
 running = True
 
-dijkstra(0,0,24,39)
+
 while running:
     #When program is closed
     for event in pygame.event.get():
@@ -163,5 +164,14 @@ while running:
                         else:
                             item[1] = (0, 255, 0)
 
+        #Key press handling
+        elif event.type == pygame.KEYDOWN:
+            # To activate Dijkstra algorithm
+            if(event.key == pygame.K_SPACE):
+                dijkstra(0,0,10,4)
+            #To reset the screen user has to press "r"
+            elif(event.key == pygame.K_r):
+                positions = []
+                buildGrid(800,20)
     #Updates the screen
     screenUpdate()
