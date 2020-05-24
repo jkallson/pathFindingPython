@@ -87,6 +87,7 @@ def findShortestPathElements(endRow,endElement):
     shortestPathElements = []
     #Getting the ending node
     node = positions[endRow][endElement]
+    shortestPathElements.append([endRow,endElement])
     #While there is still previous elements, lets continue the loop
     while node[4] != [999,999]:
         #Finding previous node position
