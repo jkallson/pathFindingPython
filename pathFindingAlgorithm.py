@@ -108,7 +108,7 @@ def visualizeShortestPath(shortestPath):
         row = item[0]
         rowElement = item[1]
         #Changing its color to yellow
-        positions[row][rowElement][1] = [241,255,31]
+        positions[row][rowElement][1] = [255,0,0]
         #Updating the screen
         screenUpdate()
 
@@ -123,7 +123,7 @@ def findLowestNode():
         for j,item in enumerate(row):
             rect, color, distance, visited,previousNode = item
             #If we have not visited the node and it has smaller best distance then lets keep that in memory
-            if distance < currentBestDistance and not visited:
+            if distance < currentBestDistance and not visited and color != (255,255,255):
                 #Row number
                 lowestX = i
                 # Row item number
@@ -161,7 +161,7 @@ def dijkstra(startx, starty, endx, endy):
         node[1] = [18,243,243]
         screenUpdate()
 
-        time.sleep(0.002)
+        time.sleep(0.003)
     #Changing end node color
     endNode[1] = (255, 0, 0)
     #Getting the shortest path elements and then visualizing it
@@ -186,15 +186,12 @@ while running:
 
         #When user clicks somewhere in the grid
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            #Check which rect was clicked and change its color on list
+            #To build a wall
             for row in positions:
                 for item in row:
                     rect, color, distance, visited,previousNode = item
                     if rect.collidepoint(event.pos):
-                        if color == (0, 255, 0):
-                            item[1] = (255, 0, 0)
-                        else:
-                            item[1] = (0, 255, 0)
+                        item[1] = (255, 255, 255)
 
         #Key press handling
         elif event.type == pygame.KEYDOWN:
