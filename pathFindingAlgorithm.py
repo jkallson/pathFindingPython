@@ -1,10 +1,10 @@
 import time
 import pygame
 
-#Array where all nodes will be held
-positions = []
 #Method which is used to build a grid
 def buildGrid(y,w):
+    # Array where all nodes will be held
+    positions = []
     #Distance used for infinity
     maxInt = 99999
     #Creating a grid
@@ -17,9 +17,10 @@ def buildGrid(y,w):
             row.append([rect, (0, 0, 0),maxInt,False,[999,999]])
         #Adding created row to the positions list
         positions.append(row)
+    return positions
 
 #Method which is used to update the screen
-def screenUpdate():
+def screenUpdate(screen, positions):
     for row in positions:
         for item in row:
             rect, color, distance, visited,previousNode = item
@@ -27,63 +28,63 @@ def screenUpdate():
     pygame.display.flip()
 
 #Function which is used to decide if distance needs to be changed
-def changeDistance(row,rowElement,distance,previousRow,previousElement):
+def changeDistance(row,rowElement,distance,previousRow,previousElement,positions):
     #If distance through some node is smaller that the existing distance, then change it
     if(distance+1 < positions[row][rowElement][2]):
         positions[row][rowElement][2] = distance + 1
         positions[row][rowElement][4][0] = previousRow
         positions[row][rowElement][4][1] = previousElement
 #Find neighbours
-def checkNeighBours(row,rowElement, distance):
+def checkNeighBours(row,rowElement, distance,positions):
     #4 neighbours
-    if(row-1>=0 and rowElement-1>= 0 and row != 24 and rowElement != 39):
-        changeDistance(row,rowElement+1,distance,row,rowElement)
-        changeDistance(row+1, rowElement, distance,row,rowElement)
-        changeDistance(row-1, rowElement, distance,row,rowElement)
-        changeDistance(row, rowElement - 1, distance,row,rowElement)
+    if(row-1>=0 and rowElement-1>= 0 and row != len(positions)-1 and rowElement != len(positions[0])-1):
+        changeDistance(row,rowElement+1,distance,row,rowElement,positions)
+        changeDistance(row+1, rowElement, distance,row,rowElement,positions)
+        changeDistance(row-1, rowElement, distance,row,rowElement,positions)
+        changeDistance(row, rowElement - 1, distance,row,rowElement,positions)
     #Left upper corner
     elif (row -1 == -1 and rowElement-1 == -1):
-        changeDistance(row, rowElement + 1, distance,row,rowElement)
-        changeDistance(row+1, rowElement, distance,row,rowElement)
+        changeDistance(row, rowElement + 1, distance,row,rowElement,positions)
+        changeDistance(row+1, rowElement, distance,row,rowElement,positions)
     #Top row
-    elif (row -1 == -1 and rowElement-1 >= 0 and rowElement != 39):
-        changeDistance(row, rowElement + 1, distance,row,rowElement)
-        changeDistance(row+1, rowElement, distance,row,rowElement)
-        changeDistance(row, rowElement - 1, distance,row,rowElement)
+    elif (row -1 == -1 and rowElement-1 >= 0 and rowElement != len(positions[0])-1):
+        changeDistance(row, rowElement + 1, distance,row,rowElement,positions)
+        changeDistance(row+1, rowElement, distance,row,rowElement,positions)
+        changeDistance(row, rowElement - 1, distance,row,rowElement,positions)
 
     # Left bottom corner
-    elif (row == 24 and rowElement - 1 == -1):
-        changeDistance(row, rowElement + 1, distance,row,rowElement)
-        changeDistance(row - 1, rowElement, distance,row,rowElement)
+    elif (row == len(positions)-1 and rowElement - 1 == -1):
+        changeDistance(row, rowElement + 1, distance,row,rowElement,positions)
+        changeDistance(row - 1, rowElement, distance,row,rowElement,positions)
 
     #Left column
     elif (row -1 >= 0 and rowElement-1 == -1):
-        changeDistance(row, rowElement + 1, distance,row,rowElement)
-        changeDistance(row+1, rowElement, distance,row,rowElement)
-        changeDistance(row-1, rowElement, distance,row,rowElement)
+        changeDistance(row, rowElement + 1, distance,row,rowElement,positions)
+        changeDistance(row+1, rowElement, distance,row,rowElement,positions)
+        changeDistance(row-1, rowElement, distance,row,rowElement,positions)
     #Top right
-    elif (row == 0 and rowElement  == 39):
-        changeDistance(row, rowElement-1, distance,row,rowElement)
-        changeDistance(row +1, rowElement, distance,row,rowElement)
+    elif (row == 0 and rowElement  == len(positions[0])-1):
+        changeDistance(row, rowElement-1, distance,row,rowElement,positions)
+        changeDistance(row +1, rowElement, distance,row,rowElement,positions)
     #Bottom right
-    elif (row == 24 and rowElement == 39):
-        changeDistance(row, rowElement - 1, distance,row,rowElement)
-        changeDistance(row - 1, rowElement, distance,row,rowElement)
+    elif (row == len(positions)-1 and rowElement == len(positions[0])-1):
+        changeDistance(row, rowElement - 1, distance,row,rowElement,positions)
+        changeDistance(row - 1, rowElement, distance,row,rowElement,positions)
 
     #Right column
-    elif (row > 0 and rowElement == 39):
-        changeDistance(row, rowElement - 1, distance,row,rowElement)
-        changeDistance(row + 1, rowElement, distance,row,rowElement)
-        changeDistance(row - 1, rowElement, distance,row,rowElement)
+    elif (row > 0 and rowElement == len(positions[0])-1):
+        changeDistance(row, rowElement - 1, distance,row,rowElement,positions)
+        changeDistance(row + 1, rowElement, distance,row,rowElement,positions)
+        changeDistance(row - 1, rowElement, distance,row,rowElement,positions)
 
     #Bottom row
-    elif (row == 24 and rowElement > 0):
-        changeDistance(row, rowElement + 1, distance,row,rowElement)
-        changeDistance(row, rowElement-1, distance,row,rowElement)
-        changeDistance(row - 1, rowElement, distance,row,rowElement)
+    elif (row == len(positions)-1 and rowElement > 0):
+        changeDistance(row, rowElement + 1, distance,row,rowElement,positions)
+        changeDistance(row, rowElement-1, distance,row,rowElement,positions)
+        changeDistance(row - 1, rowElement, distance,row,rowElement,positions)
 
 #Function which returns the shortest path elements
-def findShortestPathElements(endRow,endElement):
+def findShortestPathElements(endRow,endElement,positions):
     shortestPathElements = []
     #Getting the ending node
     node = positions[endRow][endElement]
@@ -101,7 +102,7 @@ def findShortestPathElements(endRow,endElement):
     return shortestPathElements
 
 #Function which is used to visualize the shortest path
-def visualizeShortestPath(shortestPath):
+def visualizeShortestPath(shortestPath,screen,positions):
     #This loop will go through all of the elements that are in the shortest path and change their color
     for item in shortestPath:
         #Selecting a node
@@ -110,10 +111,10 @@ def visualizeShortestPath(shortestPath):
         #Changing its color to yellow
         positions[row][rowElement][1] = [255,0,0]
         #Updating the screen
-        screenUpdate()
+        screenUpdate(screen,positions)
 
 #Function which is used to find the lowest node
-def findLowestNode():
+def findLowestNode(positions):
     lowestX = 0
     lowestY = 0
     currentBestDistance = 999999
@@ -132,7 +133,7 @@ def findLowestNode():
     return lowestX,lowestY
 
 #Dijkstra algorithm
-def dijkstra(startx, starty, endx, endy):
+def dijkstra(startx, starty, endx, endy,screen,positions):
     #Define the starting point
     startNode = positions[startx][starty]
     #Define the ending point
@@ -148,59 +149,63 @@ def dijkstra(startx, starty, endx, endy):
     #While loop which will work until we have reached the end node
     while endNode[3] is False:
         #Getting the node coordinates and distances
-        nodeX,nodeY = findLowestNode()
+        nodeX,nodeY = findLowestNode(positions)
         #Getting a new node
         node = positions[nodeX][nodeY]
         #Finding out what that node distance is
         distance = node[2]
         # Finding all of its neighbours and updating their distance
-        checkNeighBours(nodeX,nodeY, distance)
+        checkNeighBours(nodeX,nodeY, distance,positions)
         #Mark that node is visited
         node[3] = True
         #Change node color
         node[1] = [18,243,243]
-        screenUpdate()
+        screenUpdate(screen,positions)
 
         time.sleep(0.003)
     #Changing end node color
     endNode[1] = (255, 0, 0)
     #Getting the shortest path elements and then visualizing it
-    shortestPath = findShortestPathElements(endx,endy)
-    visualizeShortestPath(shortestPath)
-#Creating the game
-pygame.init()
+    shortestPath = findShortestPathElements(endx,endy,positions)
+    visualizeShortestPath(shortestPath,screen,positions)
 
-#Creating a screen
-screen = pygame.display.set_mode((800,500))
-screen.fill([255, 255, 255])
-pygame.display.update()
-#Building the grid
-buildGrid(800,20)
-running = True
+def main(screenLength, screenWidth, nodeSize):
+    #Creating the game
+    pygame.init()
 
-while running:
-    #When program is closed
-    for event in pygame.event.get():
-        if(event.type == pygame.QUIT):
-            running = False
+    #Creating a screen
+    screen = pygame.display.set_mode((screenLength,screenWidth))
+    screen.fill([255, 255, 255])
+    pygame.display.update()
+    #Building the grid
+    positions = buildGrid(screenLength,nodeSize)
+    running = True
 
-        #When user clicks somewhere in the grid
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            #To build a wall
-            for row in positions:
-                for item in row:
-                    rect, color, distance, visited,previousNode = item
-                    if rect.collidepoint(event.pos):
-                        item[1] = (255, 255, 255)
+    while running:
+        #When program is closed
+        for event in pygame.event.get():
+            if(event.type == pygame.QUIT):
+                running = False
 
-        #Key press handling
-        elif event.type == pygame.KEYDOWN:
-            # To activate Dijkstra algorithm
-            if(event.key == pygame.K_SPACE):
-                dijkstra(15,20,0,0)
-            #To reset the screen user has to press "r"
-            elif(event.key == pygame.K_r):
-                positions = []
-                buildGrid(800,20)
-    #Updates the screen
-    screenUpdate()
+            #When user clicks somewhere in the grid
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                #To build a wall
+                for row in positions:
+                    for item in row:
+                        rect, color, distance, visited,previousNode = item
+                        if rect.collidepoint(event.pos):
+                            item[1] = (255, 255, 255)
+
+            #Key press handling
+            elif event.type == pygame.KEYDOWN:
+                # To activate Dijkstra algorithm
+                if(event.key == pygame.K_SPACE):
+                    dijkstra(0,0,len(positions)-1,len(positions[0])-1,screen,positions)
+                    askForCoord = True
+                #To reset the screen user has to press "r"
+                elif(event.key == pygame.K_r):
+                    positions = buildGrid(screenLength,nodeSize)
+        #Updates the screen
+        screenUpdate(screen,positions)
+
+main(800,500,20)
