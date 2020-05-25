@@ -139,10 +139,6 @@ def dijkstra(startx, starty, endx, endy,screen,positions):
     #Define the ending point
     endNode = positions[endx][endy]
 
-    #Changing end and start point color
-    startNode[1] = (123, 52, 126)
-    endNode[1] = (123,52,126)
-
     #Changing the starting point distance to 0
     startNode[2] = 0
 
@@ -169,6 +165,7 @@ def dijkstra(startx, starty, endx, endy,screen,positions):
     shortestPath = findShortestPathElements(endx,endy,positions)
     visualizeShortestPath(shortestPath,screen,positions)
 
+#Function which is used to find start node and end node
 def nodeFinder(positions, color):
     X = 0
     Y = 0
@@ -187,10 +184,19 @@ def nodeFinder(positions, color):
 
     return X, Y
 
+#Function which is used to change start node and end node color
+def colorChanger(positions, color):
+    for row in positions:
+        for item in row:
+            rect, NodeColor, distance, visited, previousNode = item
+            if rect.collidepoint(pygame.mouse.get_pos()):
+                item[1] = color
+            elif item[1] == color:
+                item[1] = (0, 0, 0)
+
 def main(screenLength, screenWidth, nodeSize):
     #Creating the game
     pygame.init()
-
 
     #Creating a screen
     screen = pygame.display.set_mode((screenLength,screenWidth))
@@ -199,7 +205,6 @@ def main(screenLength, screenWidth, nodeSize):
     #Building the grid
     positions = buildGrid(screenLength,nodeSize)
     running = True
-
 
     while running:
         #When program is closed
@@ -219,6 +224,8 @@ def main(screenLength, screenWidth, nodeSize):
             #Key press handling
             elif event.type == pygame.KEYDOWN:
                 # To activate Dijkstra algorithm
+                #Todo! Handle exception when user does not select start and end node
+                #Todo! When there is no path show the user something
                 if(event.key == pygame.K_SPACE):
                     startNode = nodeFinder(positions,(0, 255, 34))
                     endNode = nodeFinder(positions,(34, 0, 255))
@@ -226,23 +233,12 @@ def main(screenLength, screenWidth, nodeSize):
                 #To reset the screen user has to press "r"
                 elif(event.key == pygame.K_r):
                     positions = buildGrid(screenLength,nodeSize)
+                #To mark the start node
                 elif (event.key == pygame.K_s):
-                    for row in positions:
-                        for item in row:
-                            rect, color, distance, visited, previousNode = item
-                            if rect.collidepoint(pygame.mouse.get_pos()):
-                                item[1] = (0, 255, 34)
-                            elif item[1] == (0, 255, 34):
-                                item[1] = (0, 0, 0)
-
+                    colorChanger(positions,(0, 255, 34))
+                #To mark end node
                 elif (event.key == pygame.K_e):
-                    for row in positions:
-                        for item in row:
-                            rect, color, distance, visited, previousNode = item
-                            if rect.collidepoint(pygame.mouse.get_pos()):
-                                item[1] = (34, 0, 255)
-                            elif item[1] == (34, 0, 255):
-                                item[1] = (0, 0, 0)
+                    colorChanger(positions,(34, 0, 255))
         #Updates the screen
         screenUpdate(screen,positions)
 
