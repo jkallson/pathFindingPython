@@ -212,14 +212,16 @@ def main(screenLength, screenWidth, nodeSize):
             if(event.type == pygame.QUIT):
                 running = False
 
-            #When user clicks somewhere in the grid
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                #To build a wall
-                for row in positions:
-                    for item in row:
-                        rect, color, distance, visited,previousNode = item
-                        if rect.collidepoint(event.pos):
-                            item[1] = (255, 255, 255)
+            #To draw walls
+            elif event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN:
+                #When user clicks somewhere in the grid
+                if(pygame.mouse.get_pressed()[0]):
+                    #To build a wall
+                    for row in positions:
+                        for item in row:
+                            rect, color, distance, visited,previousNode = item
+                            if rect.collidepoint(event.pos):
+                                item[1] = (255, 255, 255)
 
             #Key press handling
             elif event.type == pygame.KEYDOWN:
