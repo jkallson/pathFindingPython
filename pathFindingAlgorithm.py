@@ -169,9 +169,28 @@ def dijkstra(startx, starty, endx, endy,screen,positions):
     shortestPath = findShortestPathElements(endx,endy,positions)
     visualizeShortestPath(shortestPath,screen,positions)
 
+def nodeFinder(positions, color):
+    X = 0
+    Y = 0
+    # Iterating through all rows
+    for i, row in enumerate(positions):
+        # Iterating through all row nodes
+        for j, item in enumerate(row):
+            rect, nodeColor, distance, visited, previousNode = item
+            #If the node has the same color as the node that we are looking then lets remember it
+            if nodeColor == color:
+                # Row number
+                X = i
+                # Row item number
+                Y = j
+                break
+
+    return X, Y
+
 def main(screenLength, screenWidth, nodeSize):
     #Creating the game
     pygame.init()
+
 
     #Creating a screen
     screen = pygame.display.set_mode((screenLength,screenWidth))
@@ -180,6 +199,7 @@ def main(screenLength, screenWidth, nodeSize):
     #Building the grid
     positions = buildGrid(screenLength,nodeSize)
     running = True
+
 
     while running:
         #When program is closed
@@ -200,11 +220,29 @@ def main(screenLength, screenWidth, nodeSize):
             elif event.type == pygame.KEYDOWN:
                 # To activate Dijkstra algorithm
                 if(event.key == pygame.K_SPACE):
-                    dijkstra(0,0,len(positions)-1,len(positions[0])-1,screen,positions)
-                    askForCoord = True
+                    startNode = nodeFinder(positions,(0, 255, 34))
+                    endNode = nodeFinder(positions,(34, 0, 255))
+                    dijkstra(startNode[0],startNode[1],endNode[0],endNode[1],screen,positions)
                 #To reset the screen user has to press "r"
                 elif(event.key == pygame.K_r):
                     positions = buildGrid(screenLength,nodeSize)
+                elif (event.key == pygame.K_s):
+                    for row in positions:
+                        for item in row:
+                            rect, color, distance, visited, previousNode = item
+                            if rect.collidepoint(pygame.mouse.get_pos()):
+                                item[1] = (0, 255, 34)
+                            elif item[1] == (0, 255, 34):
+                                item[1] = (0, 0, 0)
+
+                elif (event.key == pygame.K_e):
+                    for row in positions:
+                        for item in row:
+                            rect, color, distance, visited, previousNode = item
+                            if rect.collidepoint(pygame.mouse.get_pos()):
+                                item[1] = (34, 0, 255)
+                            elif item[1] == (34, 0, 255):
+                                item[1] = (0, 0, 0)
         #Updates the screen
         screenUpdate(screen,positions)
 
