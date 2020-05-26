@@ -1,6 +1,5 @@
 import time
 from tkinter import Tk, messagebox
-
 import pygame
 
 #Method which is used to build a grid
@@ -214,6 +213,13 @@ def findIfValid(positions, color,newColor,nodeName):
     else:
         colorChanger(positions, newColor)
 
+def intro():
+        Tk().wm_withdraw()
+        messagebox.showinfo('Information about program', "Press s to select start node (start node will appear to the position where your mouse is when button is pressed)"+
+                            "\n"+"Press e to select end node"+"\n"+"Press r to reset the grid"+
+                            "\n"+"When holding down left mouse button you are able to build walls")
+
+
 def main(screenLength, screenWidth, nodeSize):
     #Creating the game
     pygame.init()
@@ -225,13 +231,13 @@ def main(screenLength, screenWidth, nodeSize):
     #Building the grid
     positions = buildGrid(screenLength,nodeSize)
     running = True
-
+    screenUpdate(screen, positions)
+    intro()
     while running:
         #When program is closed
         for event in pygame.event.get():
             if(event.type == pygame.QUIT):
                 running = False
-
             #To draw walls
             elif event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN:
                 #When user clicks somewhere in the grid
