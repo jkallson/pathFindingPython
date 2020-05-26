@@ -117,9 +117,9 @@ def visualizeShortestPath(shortestPath,screen,positions):
 
 #Function which is used to find the lowest node
 def findLowestNode(positions):
-    lowestX = 0
-    lowestY = 0
-    currentBestDistance = 999999
+    lowestX = -1
+    lowestY = -1
+    currentBestDistance = 99999
     #Iterating through all rows
     for i,row in enumerate(positions):
         #Iterating through all row nodes
@@ -144,10 +144,16 @@ def dijkstra(startx, starty, endx, endy,screen,positions):
     #Changing the starting point distance to 0
     startNode[2] = 0
 
+    #Value to see if there is a path to get to end node
+    pathExists = True
     #While loop which will work until we have reached the end node
     while endNode[3] is False:
         #Getting the node coordinates and distances
         nodeX,nodeY = findLowestNode(positions)
+        #If we have not reached the end node and all possible nodes have been looked at
+        if(nodeX == -1 and nodeY == -1):
+            pathExists = False
+            break
         #Getting a new node
         node = positions[nodeX][nodeY]
         #Finding out what that node distance is
@@ -161,11 +167,15 @@ def dijkstra(startx, starty, endx, endy,screen,positions):
         screenUpdate(screen,positions)
 
         time.sleep(0.003)
-    #Changing end node color
-    endNode[1] = (255, 0, 0)
-    #Getting the shortest path elements and then visualizing it
-    shortestPath = findShortestPathElements(endx,endy,positions)
-    visualizeShortestPath(shortestPath,screen,positions)
+    if(pathExists):
+        #Changing end node color
+        endNode[1] = (255, 0, 0)
+        #Getting the shortest path elements and then visualizing it
+        shortestPath = findShortestPathElements(endx,endy,positions)
+        visualizeShortestPath(shortestPath,screen,positions)
+    else:
+        Tk().wm_withdraw()  # to hide the main window
+        messagebox.showinfo('No path', 'Dijkstra algorithm did not find a way to get to the end node.')
 
 #Function which is used to find start node and end node
 def nodeFinder(positions, color):
@@ -195,6 +205,14 @@ def colorChanger(positions, color):
                 item[1] = color
             elif item[1] == color:
                 item[1] = (0, 0, 0)
+
+def findIfValid(positions, color,newColor,nodeName):
+    message = 'Please press "r" before adding new '+nodeName+' node'
+    if (nodeFinder(positions, color) != (-1, -1)):
+        Tk().wm_withdraw()
+        messagebox.showinfo('Error', message)
+    else:
+        colorChanger(positions, newColor)
 
 def main(screenLength, screenWidth, nodeSize):
     #Creating the game
@@ -228,15 +246,16 @@ def main(screenLength, screenWidth, nodeSize):
             #Key press handling
             elif event.type == pygame.KEYDOWN:
                 # To activate Dijkstra algorithm
-                #Todo! When there is no path show the user something
                 if(event.key == pygame.K_SPACE):
                     startNode = nodeFinder(positions,(0, 255, 34))
                     endNode = nodeFinder(positions,(34, 0, 255))
+                    #Check if the algorithm has been run before and has not been reset before running again
                     if(nodeFinder(positions,[255,0,0]) != (-1,-1)):
-                        Tk().wm_withdraw()  # to hide the main window
+                        Tk().wm_withdraw()
                         messagebox.showinfo('Error', 'Please press "r" to reset the screen.')
+                    #Check if the start or end node has not been selected
                     elif(startNode == (-1,-1) or endNode == (-1,-1)):
-                        Tk().wm_withdraw()  # to hide the main window
+                        Tk().wm_withdraw()
                         messagebox.showinfo('Error', 'Please select start and end node.')
                     else:
                         dijkstra(startNode[0],startNode[1],endNode[0],endNode[1],screen,positions)
@@ -245,18 +264,11 @@ def main(screenLength, screenWidth, nodeSize):
                     positions = buildGrid(screenLength,nodeSize)
                 #To mark the start node
                 elif (event.key == pygame.K_s):
-                    if (nodeFinder(positions, [255, 0, 0]) != (-1, -1)):
-                        Tk().wm_withdraw()  # to hide the main window
-                        messagebox.showinfo('Error', 'Please press "r" before adding new start node.')
-                    else:
-                        colorChanger(positions,(0, 255, 34))
+                    findIfValid(positions,[18,243,243],(0, 255, 34),"start")
                 #To mark end node
                 elif (event.key == pygame.K_e):
-                    if (nodeFinder(positions, [255, 0, 0]) != (-1, -1)):
-                        Tk().wm_withdraw()  # to hide the main window
-                        messagebox.showinfo('Error', 'Please press "r" before adding new end node.')
-                    else:
-                        colorChanger(positions,(34, 0, 255))
+                    #If the algorithm has been run before, tell the user to restart the screen
+                    findIfValid(positions,[18,243,243],(34, 0, 255),"end")
         #Updates the screen
         screenUpdate(screen,positions)
 
