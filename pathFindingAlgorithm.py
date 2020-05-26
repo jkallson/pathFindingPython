@@ -192,7 +192,7 @@ def nodeFinder(positions, color):
                 # Row item number
                 Y = j
                 break
-
+    #Return the coordinates
     return X, Y
 
 #Function which is used to change start node and end node color
@@ -200,6 +200,7 @@ def colorChanger(positions, color):
     for row in positions:
         for item in row:
             rect, NodeColor, distance, visited, previousNode = item
+            #If we have found the node that was clicked lets change its color
             if rect.collidepoint(pygame.mouse.get_pos()):
                 item[1] = color
             #If we have found the item which was previously a start/end node, lets change its color back to default
@@ -217,19 +218,24 @@ def colorWalls(positions,color,eventPos):
 #Find if start node or end node are on the screen
 def findIfValid(positions, color,newColor,nodeName):
     message = 'Please press "r" before adding new '+nodeName+' node'
+    #If start or end node has not been selected
     if (nodeFinder(positions, color) != (-1, -1)):
         Tk().wm_withdraw()
         messagebox.showinfo('Error', message)
+    #Otherwise change the node color
     else:
         colorChanger(positions, newColor)
 
+#Function which shows how the program works
 def intro():
         Tk().wm_withdraw()
         messagebox.showinfo('Information about program', "Press s to select start node (start node will appear to the position where your mouse is when button is pressed)"+
-                            "\n"+"Press e to select end node"+"\n"+"Press r to reset the grid."+
+                            "\n"+"Press e to select end node"+"\n"+"Press r to reset the grid."+"\n"+"Press space start the algorithm."+
                             "\n"+"When holding down/clicking left mouse button you are able to build walls."+
-                            "\n"+"When holding down/clicking right mouse button you are able to delete walls/nodes.")
+                            "\n"+"When holding down/clicking right mouse button you are able to delete walls/nodes."+
+                             "\n" + "Press i to show this info box again.")
 
+#Main function which will start the program
 def main(screenLength, screenWidth, nodeSize):
     #Creating the game
     pygame.init()
@@ -242,6 +248,7 @@ def main(screenLength, screenWidth, nodeSize):
     positions = buildGrid(screenLength,nodeSize)
     running = True
     screenUpdate(screen, positions)
+    #Showing the intro
     intro()
     while running:
         #When program is closed
@@ -260,6 +267,7 @@ def main(screenLength, screenWidth, nodeSize):
             elif event.type == pygame.KEYDOWN:
                 # To activate Dijkstra algorithm
                 if(event.key == pygame.K_SPACE):
+                    #Finding start and end node
                     startNode = nodeFinder(positions,(0, 255, 34))
                     endNode = nodeFinder(positions,(34, 0, 255))
                     #Check if the algorithm has been run before and has not been reset before running again
@@ -282,6 +290,9 @@ def main(screenLength, screenWidth, nodeSize):
                 elif (event.key == pygame.K_e):
                     #If the algorithm has been run before, tell the user to restart the screen
                     findIfValid(positions,[18,243,243],(34, 0, 255),"end")
+                #To show info again
+                elif(event.key == pygame.K_i):
+                    intro()
         #Updates the screen
         screenUpdate(screen,positions)
 
