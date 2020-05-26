@@ -202,9 +202,19 @@ def colorChanger(positions, color):
             rect, NodeColor, distance, visited, previousNode = item
             if rect.collidepoint(pygame.mouse.get_pos()):
                 item[1] = color
+            #If we have found the item which was previously a start/end node, lets change its color back to default
             elif item[1] == color:
                 item[1] = (0, 0, 0)
 
+#Function which is used to add/delete walls. Can be used to delete start and end nodes as well
+def colorWalls(positions,color,eventPos):
+    for row in positions:
+        for item in row:
+            rect, oldColor, distance, visited, previousNode = item
+            if rect.collidepoint(eventPos):
+                item[1] = color
+
+#Find if start node or end node are on the screen
 def findIfValid(positions, color,newColor,nodeName):
     message = 'Please press "r" before adding new '+nodeName+' node'
     if (nodeFinder(positions, color) != (-1, -1)):
@@ -216,9 +226,9 @@ def findIfValid(positions, color,newColor,nodeName):
 def intro():
         Tk().wm_withdraw()
         messagebox.showinfo('Information about program', "Press s to select start node (start node will appear to the position where your mouse is when button is pressed)"+
-                            "\n"+"Press e to select end node"+"\n"+"Press r to reset the grid"+
-                            "\n"+"When holding down left mouse button you are able to build walls")
-
+                            "\n"+"Press e to select end node"+"\n"+"Press r to reset the grid."+
+                            "\n"+"When holding down/clicking left mouse button you are able to build walls."+
+                            "\n"+"When holding down/clicking right mouse button you are able to delete walls/nodes.")
 
 def main(screenLength, screenWidth, nodeSize):
     #Creating the game
@@ -242,13 +252,10 @@ def main(screenLength, screenWidth, nodeSize):
             elif event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN:
                 #When user clicks somewhere in the grid
                 if(pygame.mouse.get_pressed()[0]):
-                    #To build a wall
-                    for row in positions:
-                        for item in row:
-                            rect, color, distance, visited,previousNode = item
-                            if rect.collidepoint(event.pos):
-                                item[1] = (255, 255, 255)
-
+                    colorWalls(positions,(255, 255, 255),event.pos)
+                #If user clicks with right click lets remove the wall/node
+                elif(pygame.mouse.get_pressed()[2]):
+                      colorWalls(positions,(0, 0, 0),event.pos)
             #Key press handling
             elif event.type == pygame.KEYDOWN:
                 # To activate Dijkstra algorithm
