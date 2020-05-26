@@ -1,4 +1,6 @@
 import time
+from tkinter import Tk, messagebox
+
 import pygame
 
 #Method which is used to build a grid
@@ -89,7 +91,7 @@ def findShortestPathElements(endRow,endElement,positions):
     #Getting the ending node
     node = positions[endRow][endElement]
     shortestPathElements.append([endRow,endElement])
-    #While there is still previous elements, lets continue the loop
+    #While there are still previous elements, lets continue the loop
     while node[4] != [999,999]:
         #Finding previous node position
         element = [node[4][0],node[4][1]]
@@ -108,7 +110,7 @@ def visualizeShortestPath(shortestPath,screen,positions):
         #Selecting a node
         row = item[0]
         rowElement = item[1]
-        #Changing its color to yellow
+        #Changing its color to red
         positions[row][rowElement][1] = [255,0,0]
         #Updating the screen
         screenUpdate(screen,positions)
@@ -167,8 +169,8 @@ def dijkstra(startx, starty, endx, endy,screen,positions):
 
 #Function which is used to find start node and end node
 def nodeFinder(positions, color):
-    X = 0
-    Y = 0
+    X = -1
+    Y = -1
     # Iterating through all rows
     for i, row in enumerate(positions):
         # Iterating through all row nodes
@@ -226,21 +228,35 @@ def main(screenLength, screenWidth, nodeSize):
             #Key press handling
             elif event.type == pygame.KEYDOWN:
                 # To activate Dijkstra algorithm
-                #Todo! Handle exception when user does not select start and end node
                 #Todo! When there is no path show the user something
                 if(event.key == pygame.K_SPACE):
                     startNode = nodeFinder(positions,(0, 255, 34))
                     endNode = nodeFinder(positions,(34, 0, 255))
-                    dijkstra(startNode[0],startNode[1],endNode[0],endNode[1],screen,positions)
+                    if(nodeFinder(positions,[255,0,0]) != (-1,-1)):
+                        Tk().wm_withdraw()  # to hide the main window
+                        messagebox.showinfo('Error', 'Please press "r" to reset the screen.')
+                    elif(startNode == (-1,-1) or endNode == (-1,-1)):
+                        Tk().wm_withdraw()  # to hide the main window
+                        messagebox.showinfo('Error', 'Please select start and end node.')
+                    else:
+                        dijkstra(startNode[0],startNode[1],endNode[0],endNode[1],screen,positions)
                 #To reset the screen user has to press "r"
                 elif(event.key == pygame.K_r):
                     positions = buildGrid(screenLength,nodeSize)
                 #To mark the start node
                 elif (event.key == pygame.K_s):
-                    colorChanger(positions,(0, 255, 34))
+                    if (nodeFinder(positions, [255, 0, 0]) != (-1, -1)):
+                        Tk().wm_withdraw()  # to hide the main window
+                        messagebox.showinfo('Error', 'Please press "r" before adding new start node.')
+                    else:
+                        colorChanger(positions,(0, 255, 34))
                 #To mark end node
                 elif (event.key == pygame.K_e):
-                    colorChanger(positions,(34, 0, 255))
+                    if (nodeFinder(positions, [255, 0, 0]) != (-1, -1)):
+                        Tk().wm_withdraw()  # to hide the main window
+                        messagebox.showinfo('Error', 'Please press "r" before adding new end node.')
+                    else:
+                        colorChanger(positions,(34, 0, 255))
         #Updates the screen
         screenUpdate(screen,positions)
 
